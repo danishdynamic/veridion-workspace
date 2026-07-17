@@ -1,4 +1,4 @@
-# app/services/rewriter.py
+# app/optmizer/rewriter.py
 import logging
 from google import genai
 

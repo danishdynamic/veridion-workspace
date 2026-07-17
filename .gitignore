@@ -1,0 +1,108 @@
+# ==============================================================================
+# Veridion Flow Global Gitignore
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# Systems, OS, and IDEs
+# ------------------------------------------------------------------------------
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+desktop.ini
+
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# ------------------------------------------------------------------------------
+# Microservice Dependencies (Global & Monorepo Specific)
+# ------------------------------------------------------------------------------
+node_modules/
+**/node_modules/
+
+# ------------------------------------------------------------------------------
+# Framework & Build Outputs (Next.js, Vite, general distributions)
+# ------------------------------------------------------------------------------
+# Next.js specific build and telemetry tracking
+.next/
+**/.next/
+out/
+**/out/
+.node_modules/
+
+
+# General build artifacts
+dist/
+**/dist/
+build/
+**/build/
+
+# ------------------------------------------------------------------------------
+# Python Virtual Environments & Cache (FastAPI)
+# ------------------------------------------------------------------------------
+.venv/
+venv/
+ENV/
+env/
+**/venv/
+**/.venv/
+
+**/__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+
+# ------------------------------------------------------------------------------
+# Environment Variables & Secrets (Strict Protection)
+# ------------------------------------------------------------------------------
+# 1. Global catch-all for any misplaced environment files
+.env
+.env.*
+**/.*env*
+
+# 2. Specific microservice overrides to guarantee your targeted files are blocked
+/veridion-frontend/.env.local
+/veridion-node/.env
+/veridion-fastapi/.env
+
+# 3. Explicitly whitelist example files so teams can share configuration templates
+!**/.*env*.example
+!**/.env.example
+
+# ------------------------------------------------------------------------------
+# Logs and Diagnostics
+# ------------------------------------------------------------------------------
+*.log
+*.log.*
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ------------------------------------------------------------------------------
+# Docker and DB Persistent Storage
+# ------------------------------------------------------------------------------
+.docker/
+**/postgres_data/
+**/redis_data/
+
+# ------------------------------------------------------------------------------
+# Database Engines, Local Cache, and Metadata
+# ------------------------------------------------------------------------------
+# Next.js fetch/compiler cache engines and local DB storage
+*.sst
+*.meta
+**/.sst/
+**/.meta/
+
+# Block compiled JSON caches, but allow standard project config files
+# (This ensures build metadata is ignored while keeping package.json, etc.)
+**/.next/**/*.json
+**/tsconfig*.json
+!*.json

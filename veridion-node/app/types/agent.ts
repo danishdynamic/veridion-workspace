@@ -1,3 +1,4 @@
+// app/types/agent.ts
 import { StateGraph, type StateGraphArgs } from "@langchain/langgraph";
 
 export type AgentName = 'Legal_Verifier' | 'Synthesis_Summarizer' | 'Interface_Visualizer';

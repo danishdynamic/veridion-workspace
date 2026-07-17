@@ -1,3 +1,4 @@
+// app/agents/nodes/visualizer.ts
 import type { VeridionState } from "../state";
 
 export async function visualizerNode(state: VeridionState): Promise<Partial<VeridionState>> {

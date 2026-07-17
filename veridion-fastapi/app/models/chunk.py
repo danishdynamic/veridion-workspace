@@ -1,3 +1,4 @@
+#models/chunk.py
 from typing import TYPE_CHECKING
 from uuid import uuid4
 from sqlalchemy import String, ForeignKey, Index
@@ -20,7 +21,7 @@ class DocumentChildChunk(Base):
     )
     
     chunk_text: Mapped[str] = mapped_column(String, nullable=False)
-    embedding: Mapped[Vector] = mapped_column(Vector(768), nullable=False)
+    embedding: Mapped[Vector] = mapped_column(Vector(1536), nullable=False)
 
     parent: Mapped["DocumentParent"] = relationship(
         "DocumentParent", 

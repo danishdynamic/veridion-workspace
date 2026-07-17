@@ -1,3 +1,4 @@
+// app/services/fastapi.client.ts
 import axios from 'axios';
 
 export interface RAGSearchPayload {

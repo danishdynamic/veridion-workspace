@@ -1,4 +1,4 @@
-# app/api/v1/retrieve.py
+# api/v1/retrieve.py
 import json
 from typing import Optional, List
 from pydantic import BaseModel, Field

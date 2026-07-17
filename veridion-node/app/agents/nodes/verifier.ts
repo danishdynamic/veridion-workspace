@@ -1,3 +1,4 @@
+// app/agents/nodes/verifier.ts
 import type { VeridionState } from "../state";
 import { fastApiClient } from '../../services/fastapi.client';
 

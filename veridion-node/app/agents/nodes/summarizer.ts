@@ -1,3 +1,4 @@
+// app/agents/nodes/summarizer.ts
 import type { VeridionState } from "../state";
 import { ChatOpenAI } from "@langchain/openai";
 

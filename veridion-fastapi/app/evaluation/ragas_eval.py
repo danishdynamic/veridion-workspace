@@ -1,9 +1,8 @@
-
+#evaluation/ragas_eval.py
 from typing import List, Dict
 from datasets import Dataset
 from ragas import evaluate
 from ragas.metrics import faithfulness, answer_relevance, context_utilization
-# Fix 1: Import from the updated schema module path
 from ragas.dataset_schema import EvaluationResult
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 

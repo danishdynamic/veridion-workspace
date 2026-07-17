@@ -1,3 +1,4 @@
+// app/middleware/security.ts
 export class SecurityFilter {
   private static BANNED_PATTERNS = [
     /ignore previous instructions/i,

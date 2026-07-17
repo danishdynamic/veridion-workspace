@@ -1,3 +1,4 @@
+// app/services/ws.manager.ts
 import { WebSocket } from 'ws';
 
 export class WebSocketManager {

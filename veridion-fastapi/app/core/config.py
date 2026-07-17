@@ -1,3 +1,4 @@
+# core/config.py
 import os
 from typing import Optional, List
 from pydantic import Field, PostgresDsn, RedisDsn, field_validator,TypeAdapter

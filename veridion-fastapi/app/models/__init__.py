@@ -1,3 +1,4 @@
+#models/__init__.py
 from app.core.database import Base
 from app.models.document import DocumentParent
 from app.models.chunk import DocumentChildChunk

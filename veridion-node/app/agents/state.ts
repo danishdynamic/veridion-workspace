@@ -1,3 +1,4 @@
+// app/agents/state.ts
 import { Annotation } from "@langchain/langgraph";
 import type { AgentLog } from "../types/agent";
 
