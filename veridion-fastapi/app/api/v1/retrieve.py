@@ -1,22 +1,32 @@
-# api/v1/retrieve.py
 import json
-from typing import Optional, List
-from pydantic import BaseModel, Field
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.ext.asyncio import AsyncSession
+import logging
+from typing import Any, List, Optional
 
+from fastapi import APIRouter, Depends, HTTPException, status
+from pydantic import BaseModel, Field
+from sqlalchemy.ext.asyncio import AsyncSession
+from app.core.config import settings
 from app.core.database import get_db
-from app.services.vector_search import VeridionVectorSearchService
-from app.optimizer.rewriter import ComplianceQueryRewriter
 from app.optimizer.reranker import ComplianceReranker
-from app.services.llm import generate_response
+from app.optimizer.rewriter import ComplianceQueryRewriter
 from app.services.kv_cache import kv_cache
+from app.services.llm import generate_response
+from app.services.vector_search import VeridionVectorSearchService
+from app.services.pipeline import rag_pipeline
+
+logger = logging.getLogger("veridion_retrieval_router")
 
 router = APIRouter()
 
 # Instantiate optimization engines
 rewriter = ComplianceQueryRewriter()
 reranker = ComplianceReranker()
+
+# Pipeline execution tracking constants for strict KV Cache invalidation
+MODEL_NAME = settings.DEFAULT_MODEL
+PROMPT_VERSION = "v1.0"
+PIPELINE_VERSION = "v1.0"
+
 
 # --- REQUEST / RESPONSE SCHEMAS ---
 
@@ -26,14 +36,20 @@ class ComplianceSearchRequest(BaseModel):
     deployment_region: Optional[str] = Field(None, description="Target geo bounds constraint zone")
     limit: Optional[int] = Field(4, ge=1, le=20)
 
+
 class ComplianceSearchResponse(BaseModel):
-    parent_id: str
+    document_id: str
     document_title: str
-    version_tag: str
+    version_id: str
+    version_number: str
+    section_id: str
+    section_heading: Optional[str]
+    clause_id: str
+    clause_number: Optional[str]
+    clause_text: str
     similarity_score: float
-    matched_child_context: str
-    legal_context_chunk: str
-    metadata: dict
+    metadata: dict[str, Any]
+
 
 class ChatPayload(BaseModel):
     prompt: str
@@ -63,14 +79,14 @@ async def chat_endpoint(payload: ChatPayload):
         )
 
 
-@router.post("/query", response_model=List[ComplianceSearchResponse])
+@router.post("/query", response_model=list[ComplianceSearchResponse])
 async def query_compliance_matrix(
     payload: ComplianceSearchRequest,
     db: AsyncSession = Depends(get_db)
 ):
     """
-    Executes a high-performance vector compliance lookup utilizing HyDE query expansion,
-    hybrid pgvector metadata filtering, Redis KV caching, and Cross-Encoder re-ranking.
+    Executes an optimized vector compliance lookup utilizing threshold-gated HyDE query expansion,
+    hybrid pgvector metadata filtering, multi-parameter Redis KV caching, and Cross-Encoder re-ranking.
     """
     try:
         search_service = VeridionVectorSearchService(db_session=db)
@@ -79,43 +95,74 @@ async def query_compliance_matrix(
         sector = payload.industry_sector or "General"
         region = payload.deployment_region or "Global"
         
-        # 1. Expand query via HyDE (Hypothetical Document Embeddings)
-        expanded_query = await rewriter.generate_hyde_document(
-            query=payload.query, 
-            sector=sector, 
-            region=region
-        )
-        
-        # 2. Fetch raw vector matches from pgvector via the expanded query
-        # Over-fetching (limit=20) provides a healthy candidate pool for the re-ranker
+        # ----------------------------------------------------------------------
+        # 1. Fast Path: Direct vector search first (No initial LLM latency)
+        # ----------------------------------------------------------------------
         raw_db_rows = await search_service.execute_hybrid_search(
-            query_text=expanded_query,
+            query_text=payload.query,
             industry_sector=payload.industry_sector,
             deployment_region=payload.deployment_region,
-            limit=20  
+            limit=20  # Over-fetching candidate pool for re-ranking
         )
         
-        # 3. Handle early exit if zero matching records are located in database
+        # ----------------------------------------------------------------------
+        # 2. Threshold Check: Trigger HyDE fallback ONLY if confidence is low
+        # ----------------------------------------------------------------------
+        top_score = raw_db_rows[0].get("similarity_score", 0.0) if raw_db_rows else 0.0
+
+        if rewriter.should_trigger_hyde(top_score):
+            expanded_query = await rewriter.generate_hyde_document(
+                query=payload.query, 
+                sector=sector, 
+                region=region
+            )
+            
+            # Re-execute search with hypothetical compliance text
+            raw_db_rows = await search_service.execute_hybrid_search(
+                query_text=expanded_query,
+                industry_sector=payload.industry_sector,
+                deployment_region=payload.deployment_region,
+                limit=20
+            )
+
+        # Early exit if zero matching records were found across both passes
         if not raw_db_rows:
             return []
 
-        # 4. Extract matching chunk IDs to check high-speed Redis KV Cache state
-        chunk_ids = [str(row["id"]) for row in raw_db_rows]
+        # ----------------------------------------------------------------------
+        # 3. Cache Evaluation: Extract clause_ids & query Redis with pipeline state
+        # ----------------------------------------------------------------------
+        context_ids = [str(row["clause_id"]) for row in raw_db_rows]
         
-        # 5. Check KV Cache before executing expensive re-ranking calculation blocks
-        cached_inference = await kv_cache.get_cached_inference(chunk_ids, payload.query)
+        cached_inference = await kv_cache.get_cached_inference(
+            chunk_ids=context_ids, 
+            query=payload.query,
+            model=MODEL_NAME,
+            prompt_version=PROMPT_VERSION,
+            version=PIPELINE_VERSION
+        )
+        
         if cached_inference:
             return json.loads(cached_inference)
         
-        # 6. Rerank down to absolute top-tier quality context using Cross-Encoders
+        # ----------------------------------------------------------------------
+        # 4. Cross-Encoder Re-Ranking & Cache Update
+        # ----------------------------------------------------------------------
         optimized_results = reranker.rerank_contexts(
             query=payload.query, 
             raw_results=raw_db_rows, 
             top_n=request_limit
         )
         
-        # 7. Save optimized response metrics to Cache layer for future operations
-        await kv_cache.set_cached_inference(chunk_ids, payload.query, json.dumps(optimized_results))
+        # Save to Redis using the exact pipeline parameter signature
+        await kv_cache.set_cached_inference(
+            chunk_ids=context_ids, 
+            query=payload.query, 
+            response_text=json.dumps(optimized_results),
+            model=MODEL_NAME,
+            prompt_version=PROMPT_VERSION,
+            version=PIPELINE_VERSION
+        )
         
         return optimized_results
 

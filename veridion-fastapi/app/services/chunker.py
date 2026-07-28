@@ -1,101 +1,127 @@
-#services/chunker.py
+# services/chunker.py
 import re
-from typing import List, Dict, Any
 import uuid
+from typing import Any, Dict, List
 
-class HierarchicalComplianceChunker:
-    def __init__(self, parent_size: int = 2000, child_size: int = 400, overlap: int = 50):
-        self.parent_size = parent_size
-        self.child_size = child_size
-        self.overlap = overlap
 
-    def _clean_text(self, text: str) -> str:
-        """Standardizes whitespaces and normalizes document characters."""
-        text = re.sub(r'\s+', ' ', text)
-        return text.strip()
+class LegalHierarchyChunker:
+    """
+    Parses legal/compliance documents into a strict 4-tier structural tree:
+    Document -> Version -> Section (Chapter/Section) -> Clause (Article/Paragraph/Bullet)
+    """
 
-    def _split_into_sentences(self, text: str) -> List[str]:
-        """Splits regulatory text by sentence boundaries while preserving article markers."""
-        # Avoid splitting on common legal abbreviations like 'Art.' or 'e.g.'
-        sentence_end = re.compile(r'(?<!\bArt)(?<!\be\.g)(?<!\bi\.e)\.\s+')
-        sentences = sentence_end.split(text)
-        return [s.strip() + "." for s in sentences if s.strip()]
+    def __init__(self, max_clause_tokens: int = 400):
+        self.max_clause_tokens = max_clause_tokens
 
-    def _chunk_tokens(self, text: str, max_tokens: int) -> List[str]:
-        """Fallback character/word-based chunking framework window."""
-        words = text.split(' ')
-        chunks = []
-        current_chunk = []
-        current_length = 0
-        
-        for word in words:
-            # Approximate token allocation sizing (1 word ~ 1.3 tokens)
-            word_cost = int(len(word) / 4) + 1
-            if current_length + word_cost > max_tokens:
-                chunks.append(" ".join(current_chunk))
-                # Retain partial window overlap
-                current_chunk = current_chunk[-self.overlap:] if len(current_chunk) > self.overlap else current_chunk
-                current_length = sum([int(len(w) / 4) + 1 for w in current_chunk])
-            
-            current_chunk.append(word)
-            current_length += word_cost
-            
-        if current_chunk:
-            chunks.append(" ".join(current_chunk))
-        return chunks
+        # Regex definitions for structural legal headers
+        self.chapter_pattern = re.compile(
+            r'^(CHAPTER|TITLE)\s+([IVXLCDM\d]+)[:\.\s]*(.*)$', re.IGNORECASE
+        )
+        self.section_pattern = re.compile(
+            r'^(SECTION)\s+(\d+|[IVXLCDM]+)[:\.\s]*(.*)$', re.IGNORECASE
+        )
+        self.article_pattern = re.compile(
+            r'^(ARTICLE|CLAUSE)\s+(\d+|[IVXLCDM]+)[:\.\s]*(.*)$', re.IGNORECASE
+        )
+        self.paragraph_pattern = re.compile(
+            r'^(?:\(?(\d+|[a-z])\)?[\.\s])\s*(.*)$'
+        )
+        self.bullet_pattern = re.compile(
+            r'^(?:[•\-–*]|\(([i|v|x]+)\))\s*(.*)$', re.IGNORECASE
+        )
 
-    def generate_hierarchy(self, raw_text: str) -> List[Dict[str, Any]]:
+    def _clean_line(self, text: str) -> str:
+        return re.sub(r'\s+', ' ', text).strip()
+
+    def parse_legal_tree(self, raw_text: str) -> List[Dict[str, Any]]:
         """
-        Parses raw text structures down into isolated Parent blocks,
-        and then recursively populates smaller child vectors maps underneath them.
+        Parses unformatted legal text into structured Section and Clause entities.
+        
+        Returns:
+            List of Section dicts containing nested Clause entities for direct DB insertion.
         """
-        cleaned_text = self._clean_text(raw_text)
-        
-        # 1. Structural Generation: Segment text roughly into Parent blocks
-        # In a compliance setting, we look for Article boundaries first
-        article_split_pattern = r'(?=Article\s+\d+|ANNEX\s+[I|V|X]+)'
-        raw_parent_blocks = re.split(article_split_pattern, cleaned_text, flags=re.IGNORECASE)
-        
-        parent_chunks = []
-        for block in raw_parent_blocks:
-            if not block.strip():
-                continue
-            # If an article is massive, hard-split it by token allowance boundaries
-            if len(block.split()) * 1.3 > self.parent_size:
-                parent_chunks.extend(self._chunk_tokens(block, self.parent_size))
-            else:
-                parent_chunks.append(block.strip())
+        lines = [self._clean_line(line) for line in raw_text.splitlines() if line.strip()]
 
-        processed_hierarchy = []
+        sections: List[Dict[str, Any]] = []
+        current_section = {
+            "section_id": str(uuid.uuid4()),
+            "title": "General Provisions",
+            "section_number": "1.0",
+            "clauses": []
+        }
 
-        # 2. Child Generation: Loop through mapped Parents to extract sub-chunks
-        for parent_text in parent_chunks:
-            parent_id = str(uuid.uuid4())
-            sentences = self._split_into_sentences(parent_text)
-            
-            child_chunks = []
-            current_child = ""
-            
-            for sentence in sentences:
-                # Check if adding the sentence exceeds child boundary limits
-                if len((current_child + " " + sentence).split()) * 1.3 > self.child_size:
-                    if current_child.strip():
-                        child_chunks.append(current_child.strip())
-                    current_child = sentence
-                else:
-                    current_child = (current_child + " " + sentence).strip()
-            
-            if current_child.strip():
-                child_chunks.append(current_child.strip())
-                
-            # Fallback if sentence parsing failed to yield blocks
-            if not child_chunks:
-                child_chunks = self._chunk_tokens(parent_text, self.child_size)
+        current_article_title = "Preamble"
+        current_article_num = "0"
+        current_clause_buffer: List[str] = []
+        clause_sequence = 0
 
-            processed_hierarchy.append({
-                "parent_id": parent_id,
-                "parent_text": parent_text,
-                "children": [{"child_text": child} for child in child_chunks]
+        def flush_clause_buffer():
+            nonlocal current_clause_buffer, clause_sequence
+            if not current_clause_buffer:
+                return
+
+            clause_text = "\n".join(current_clause_buffer).strip()
+            if not clause_text:
+                return
+
+            clause_sequence += 1
+            current_section["clauses"].append({
+                "clause_id": str(uuid.uuid4()),
+                "clause_number": f"{current_article_num}.{clause_sequence}",
+                "title": current_article_title,
+                "text": clause_text,
+                "token_estimate": int(len(clause_text.split()) * 1.3)
             })
+            current_clause_buffer = []
 
-        return processed_hierarchy
+        for line in lines:
+            # 1. Match Chapter / Section (Creates top-level Section)
+            chap_match = self.chapter_pattern.match(line)
+            sec_match = self.section_pattern.match(line)
+            header_match = chap_match or sec_match
+
+            if header_match is not None:
+                flush_clause_buffer()
+                
+                # Single if statement combined with `and` to avoid nested conditions
+                if current_section["clauses"] and len(current_section["clauses"]) > 0:
+                    sections.append(current_section)
+
+                prefix = header_match.group(1).upper()
+                num = header_match.group(2)
+                title = header_match.group(3) or "Untitled"
+
+                current_section = {
+                    "section_id": str(uuid.uuid4()),
+                    "title": f"{prefix} {num}: {title}".strip(" :"),
+                    "section_number": num,
+                    "clauses": []
+                }
+                clause_sequence = 0
+                continue
+
+            # 2. Match Article / Clause Boundary
+            art_match = self.article_pattern.match(line)
+            if art_match is not None:
+                flush_clause_buffer()
+                prefix = art_match.group(1).capitalize()
+                current_article_num = art_match.group(2)
+                current_article_title = f"{prefix} {current_article_num}: {art_match.group(3)}".strip(" :")
+                continue
+
+            # 3. Match Paragraphs / Sub-articles / Bullets
+            para_match = self.paragraph_pattern.match(line)
+            bullet_match = self.bullet_pattern.match(line)
+
+            # Combined single `if` statement using `and` to avoid nesting
+            if (para_match is not None or bullet_match is not None) and current_clause_buffer and (len(" ".join(current_clause_buffer).split()) * 1.3 > self.max_clause_tokens):
+                flush_clause_buffer()
+
+            current_clause_buffer.append(line)
+
+        # Flush final remaining buffers
+        flush_clause_buffer()
+        if current_section["clauses"] and len(current_section["clauses"]) > 0:
+            sections.append(current_section)
+
+        return sections

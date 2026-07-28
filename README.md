@@ -12,6 +12,11 @@ The monorepo workspace is explicitly separated into independent execution layers
 *   **`veridion-node/` (Security & Gateway Orchestration):** Node.js, TypeScript, Express, WebSockets, and asynchronous task management via BullMQ/Redis.
 *   **`veridion-frontend/` (Analytics Portal):** Next.js App Router (TypeScript), Material UI (MUI) components, Tailwind CSS styling tokens, TanStack Query data fetching, and Zustand client store management.
 *   **Infrastructure (Docker Layer):** PostgreSQL (`pgvector` expansion enabled) and Redis instances.
+*   
+
+- FastAPI = AI infrastructure (RAG, embeddings, vector search, evaluation, caching)
+- Node.js = AI orchestration (LangGraph, agents, WebSocket, HITL, frontend communication)
+- Next.js = UI
 
 ---
 
@@ -25,6 +30,22 @@ veridion-workspace/
 ├── veridion-fastapi/               # Data processing & Parent-Child chunk engine
 ├── veridion-node/                  # State orchestration & real-time socket gateway
 └── veridion-frontend/              # Next.js workspace & Material UI interface
+```
+
+```bash
+                 NextJS
+                    │
+                    ▼
+          NodeJS Orchestrator
+        (LangGraph + WebSockets)
+                    │
+     ┌──────────────┴─────────────┐
+     │                            │
+ FastAPI                    Redis/BullMQ
+(Vector Search)            Cache + HITL
+     │
+ PostgreSQL + pgvector
+
 ```
 
 ## 🛠️ Rapid Local Initialization Setup

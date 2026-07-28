@@ -1,12 +1,14 @@
 # services/vector_search.py
-from typing import List, Dict, Any, Optional
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, text
+from typing import Any, Dict, List, Optional
+
 import openai
+from sqlalchemy import select, text
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
-from app.models.document import DocumentParent
 from app.models.chunk import DocumentChildChunk
+from app.models.document import DocumentParent
+
 
 class VeridionVectorSearchService:
     def __init__(self, db_session: AsyncSession):
@@ -15,7 +17,7 @@ class VeridionVectorSearchService:
         self.client = openai.AsyncOpenAI(api_key=settings.GEMINI_API_KEY)
 
     # Cleaned: Applied the 'Vector' type hint to explicitly annotate the returning array layout
-    async def _get_embedding(self, query_text: str) -> List[float]:
+    async def _get_embedding(self, query_text: str) -> list[float]:
         """Generates a 768-dimension vector embedding for incoming query string."""
         response = await self.client.embeddings.create(
             input=[query_text],
@@ -26,10 +28,10 @@ class VeridionVectorSearchService:
     async def execute_hybrid_search(
         self, 
         query_text: str, 
-        industry_sector: Optional[str] = None,
-        deployment_region: Optional[str] = None,
+        industry_sector: str | None = None,
+        deployment_region: str | None = None,
         limit: int = 4
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """
         Executes an HNSW-accelerated vector similarity query cross-referenced with
         hard JSONB metadata filters, returning the full Parent context blocks.

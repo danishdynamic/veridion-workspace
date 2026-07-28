@@ -1,7 +1,7 @@
 // app/agents/workflow.ts
 import { StateGraph } from "@langchain/langgraph";
 import { StateAnnotation } from "./state";
-import { verifierNode } from "./nodes/verifier";
+import { verifierNode } from "./nodes/retrieval";
 import { summarizerNode } from "./nodes/summarizer";
 import { visualizerNode } from "./nodes/visualizer";
 

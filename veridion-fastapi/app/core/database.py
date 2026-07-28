@@ -1,7 +1,10 @@
 #core/database.py
-from typing import AsyncGenerator, cast
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
+from typing import cast
+from collections.abc import AsyncGenerator
+
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase
+
 from app.core.config import settings
 
 # 1. Ensure the URL is treated as a strict string, resolving the IDE type error

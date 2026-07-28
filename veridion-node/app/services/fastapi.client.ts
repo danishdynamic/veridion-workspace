@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 export interface RAGSearchPayload {
-  query: str;
+  query: string;
   industry_sector?: string;
   deployment_region?: string;
   limit?: number;
