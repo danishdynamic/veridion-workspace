@@ -1,19 +1,28 @@
 // app/agents/workflow.ts
 import { StateGraph } from "@langchain/langgraph";
-import { StateAnnotation } from "./state";
-import { verifierNode } from "./nodes/retrieval";
-import { summarizerNode } from "./nodes/summarizer";
-import { visualizerNode } from "./nodes/visualizer";
+import { StateAnnotation, type VeridionState } from "./state";
+import { retrievalNode } from "./nodes/retrieval";
+import { versionComparatorNode } from "./nodes/versionComparator";
+import { formAdvisorNode } from "./nodes/formAdvisor";
+import { responseNode } from "./nodes/response";
 
-// Initialize the StateGraph with your annotated state schema
+function shouldCompareVersions(state: VeridionState): "version_comparator" | "response" {
+  if (state.ragContexts && state.ragContexts.length > 0) {
+    return "version_comparator";
+  }
+  return "response";
+}
+
 const workflow = new StateGraph(StateAnnotation)
-  .addNode("verifier", verifierNode)
-  .addNode("summarizer", summarizerNode)
-  .addNode("visualizer", visualizerNode)
-  
-  .addEdge("__start__", "verifier")
-  .addEdge("verifier", "summarizer")
-  .addEdge("summarizer", "visualizer")
-  .addEdge("visualizer", "__end__");
+  .addNode("retrieval", retrievalNode)
+  .addNode("version_comparator", versionComparatorNode)
+  .addNode("form_advisor", formAdvisorNode)
+  .addNode("response", responseNode)
+
+  .addEdge("__start__", "retrieval")
+  .addConditionalEdges("retrieval", shouldCompareVersions)
+  .addEdge("version_comparator", "form_advisor")
+  .addEdge("form_advisor", "response")
+  .addEdge("response", "__end__");
 
 export const agentEngine = workflow.compile();

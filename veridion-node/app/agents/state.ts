@@ -2,7 +2,24 @@
 import { Annotation } from "@langchain/langgraph";
 import type { AgentLog } from "../types/agent";
 
+export interface ClauseChange {
+  clauseNumber: string;
+  changeType: "NEW" | "MODIFIED" | "REMOVED" | "UNCHANGED";
+  oldText?: string | undefined;
+  newText?: string | undefined;
+  impactAssessment: string;
+}
+
+export interface FormRecommendation {
+  fieldId: string;
+  fieldName: string;
+  status: "UPDATE_REQUIRED" | "COMPLIANT" | "REVIEW_WARNING";
+  reason: string;
+  suggestedValue?: string;
+}
+
 export const StateAnnotation = Annotation.Root({
+  // Request Input Metadata
   userQuery: Annotation<string>({
     reducer: (x, y) => y ?? x,
     default: () => "",
@@ -23,7 +40,31 @@ export const StateAnnotation = Annotation.Root({
     reducer: (x, y) => ({ ...x, ...y }),
     default: () => ({}),
   }),
+
+  // Multi-tier Retrieval Contexts
   ragContexts: Annotation<any[]>({
+    reducer: (x, y) => y ?? x,
+    default: () => [],
+  }),
+  latestVersion: Annotation<string>({
+    reducer: (x, y) => y ?? x,
+    default: () => "v2.0",
+  }),
+  previousVersion: Annotation<string>({
+    reducer: (x, y) => y ?? x,
+    default: () => "v1.0",
+  }),
+
+  // Cross-Agent Domain State
+  versionChanges: Annotation<ClauseChange[]>({
+    reducer: (x, y) => y ?? x,
+    default: () => [],
+  }),
+  hasDiffs: Annotation<boolean>({
+    reducer: (x, y) => y ?? x,
+    default: () => false,
+  }),
+  formRecommendations: Annotation<FormRecommendation[]>({
     reducer: (x, y) => y ?? x,
     default: () => [],
   }),
@@ -31,7 +72,9 @@ export const StateAnnotation = Annotation.Root({
     reducer: (x, y) => y ?? x,
     default: () => false,
   }),
-  textSummary: Annotation<string>({
+
+  // Formatting & UI State
+  summary: Annotation<string>({
     reducer: (x, y) => y ?? x,
     default: () => "",
   }),
@@ -39,17 +82,15 @@ export const StateAnnotation = Annotation.Root({
     reducer: (x, y) => y ?? x,
     default: () => ({}),
   }),
-  formErrors: Annotation<any[]>({
+  confidenceScore: Annotation<number>({
     reducer: (x, y) => y ?? x,
-    default: () => [],
+    default: () => 0.0,
   }),
+
+  // Operational Logs & HITL Flags
   hitlApproved: Annotation<boolean>({
     reducer: (x, y) => y ?? x,
     default: () => false,
-  }),
-  hitlComments: Annotation<string>({
-    reducer: (x, y) => y ?? x,
-    default: () => "",
   }),
   logs: Annotation<AgentLog[]>({
     reducer: (x, y) => x.concat(y),
@@ -57,5 +98,4 @@ export const StateAnnotation = Annotation.Root({
   }),
 });
 
-// Extract a clean TypeScript type from the Annotation schema for your node parameters
 export type VeridionState = typeof StateAnnotation.State;

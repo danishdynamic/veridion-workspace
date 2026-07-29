@@ -1,13 +1,13 @@
-// app/agents/nodes/verifier.ts
+// app/agents/nodes/retrieval.ts
 import type { VeridionState } from "../state";
-import { fastApiClient } from '../../services/fastapi.client';
+import { fastApiClient } from "../../services/fastapi.client";
 
-export async function verifierNode(state: VeridionState): Promise<Partial<VeridionState>> {
+export async function retrievalNode(state: VeridionState): Promise<Partial<VeridionState>> {
   const logEntry = {
     timestamp: new Date().toISOString(),
-    agentName: 'Legal_Verifier' as const,
+    agentName: 'Retrieval_Agent' as const,
     status: 'THINKING' as const,
-    message: 'Querying advanced vector layer & computing version diff parameters.'
+    message: 'Extracting historical and current regulatory contexts from vector store.'
   };
 
   try {
@@ -17,16 +17,14 @@ export async function verifierNode(state: VeridionState): Promise<Partial<Veridi
       deployment_region: state.deploymentRegion
     });
 
-    // Simple rule mapping mock for pipeline verification
-    const compliancePassed = contexts.length > 0 && !state.sanitizedQuery.toLowerCase().includes('violation');
-
     return {
       ragContexts: contexts,
-      compliancePassed,
+      latestVersion: contexts[0]?.version_tag || "v2.0 (2025)",
+      previousVersion: contexts[1]?.version_tag || "v1.0 (2022)",
       logs: [logEntry, {
         ...logEntry,
         status: 'SUCCESS',
-        message: `Context matrix successfully constructed. Found ${contexts.length} source matches.`
+        message: `Retrieved ${contexts.length} multi-tier regulatory clauses.`
       }]
     };
   } catch (error: any) {
@@ -34,7 +32,7 @@ export async function verifierNode(state: VeridionState): Promise<Partial<Veridi
       logs: [logEntry, {
         ...logEntry,
         status: 'FAILED',
-        message: `Verification processing exception: ${error.message}`
+        message: `Retrieval failure: ${error.message}`
       }]
     };
   }
