@@ -17,5 +17,5 @@ export async function deleteDocumentAction(id: string) {
 }
 
 export async function getVersionsAction(title: string) {
-  return await documentsApi.versions(title);
+  return await documentsApi.getByTitle(title);
 }
