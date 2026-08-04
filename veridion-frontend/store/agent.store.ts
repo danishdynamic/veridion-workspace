@@ -1,20 +1,75 @@
 import { create } from "zustand";
-import { AgentLog, AgentName, AgentState, ChartDataPoint, FormErrorItem, SummaryOutput } from "@/types/agent";
+import {
+  AgentLog as UiAgentLog,
+  AgentName,
+  AgentState,
+  ChartDataPoint,
+  FormErrorItem,
+  SummaryOutput,
+} from "@/types/agent";
+import {
+  AgentExecution,
+  AgentNode,
+  ExecutionMetric,
+  HitlRequest,
+  QueueJob,
+  ExecutionTrace,
+  AgentLog as MonitorAgentLog,
+} from "@/types/agent-monitor";
 
-interface AgentStoreActions {
+// Actions for Agent Execution State
+interface AgentExecutionActions {
   setConnected: (connected: boolean) => void;
   setCurrentAgent: (agent: AgentName | null) => void;
-  addLog: (log: AgentLog) => void;
+  addLog: (log: UiAgentLog) => void;
   setSummary: (summary: SummaryOutput | null) => void;
   setChart: (chart: ChartDataPoint[] | null) => void;
   setErrors: (errors: FormErrorItem[]) => void;
-  setLoading: (loading: boolean) => void;
   setFinished: (finished: boolean) => void;
-  setHitl: (required: boolean, details?: { prompt?: string; agentName?: AgentName }) => void;
+  setHitlState: (
+    required: boolean,
+    details?: { prompt?: string; agentName?: AgentName }
+  ) => void;
   reset: () => void;
 }
 
-const initialState: AgentState = {
+// Actions for Agent Telemetry & Monitoring
+interface AgentMonitorActions {
+  setSelectedExecution: (execution: AgentExecution | null) => void;
+  setSelectedAgent: (agent: AgentNode | null) => void;
+  toggleLive: () => void;
+  appendLog: (log: MonitorAgentLog) => void;
+  clearLogs: () => void;
+  setPipeline: (pipeline: AgentNode[]) => void;
+  setQueue: (queue: QueueJob[]) => void;
+  setHitlRequests: (hitl: HitlRequest[]) => void;
+  setMetrics: (metrics: ExecutionMetric) => void;
+  setTimeline: (timeline: ExecutionTrace[]) => void;
+  setLoading: (loading: boolean) => void;
+  resolveHitl: (id: string, action: "approve" | "reject") => void;
+}
+
+// Monitoring State Interface
+interface AgentMonitorState {
+  selectedExecution: AgentExecution | null;
+  selectedAgent: AgentNode | null;
+  liveMode: boolean;
+  executionLogs: MonitorAgentLog[];
+  pipeline: AgentNode[];
+  queue: QueueJob[];
+  hitlRequests: HitlRequest[];
+  metrics: ExecutionMetric | null;
+  timeline: ExecutionTrace[];
+}
+
+// Unified Store Type
+export type FullAgentStore = AgentState &
+  AgentMonitorState &
+  AgentExecutionActions &
+  AgentMonitorActions;
+
+// Initial States
+const initialAgentState: AgentState = {
   connected: false,
   currentAgent: null,
   completedAgents: 0,
@@ -28,8 +83,21 @@ const initialState: AgentState = {
   hitlDetails: null,
 };
 
-export const useAgentStore = create<AgentState & AgentStoreActions>((set) => ({
-  ...initialState,
+const initialMonitorState: AgentMonitorState = {
+  selectedExecution: null,
+  selectedAgent: null,
+  liveMode: true,
+  executionLogs: [],
+  pipeline: [],
+  queue: [],
+  hitlRequests: [],
+  metrics: null,
+  timeline: [],
+};
+
+export const useAgentStore = create<FullAgentStore>((set) => ({
+  ...initialAgentState,
+  ...initialMonitorState,
 
   setConnected: (connected) => set({ connected }),
   setCurrentAgent: (currentAgent) => set({ currentAgent }),
@@ -44,9 +112,30 @@ export const useAgentStore = create<AgentState & AgentStoreActions>((set) => ({
   setSummary: (summary) => set({ summary }),
   setChart: (chart) => set({ chart }),
   setErrors: (formErrors) => set({ formErrors }),
-  setLoading: (loading) => set({ loading }),
   setFinished: (finished) => set({ finished, loading: false }),
-  setHitl: (hitlRequired, details) =>
+  setHitlState: (hitlRequired, details) =>
     set({ hitlRequired, hitlDetails: details || null }),
-  reset: () => set({ ...initialState }),
+  reset: () => set({ ...initialAgentState, ...initialMonitorState }),
+
+  setSelectedExecution: (selectedExecution) => set({ selectedExecution }),
+  setSelectedAgent: (selectedAgent) => set({ selectedAgent }),
+  toggleLive: () => set((state) => ({ liveMode: !state.liveMode })),
+  appendLog: (log) =>
+    set((state) => ({ executionLogs: [log, ...state.executionLogs] })),
+  clearLogs: () => set({ executionLogs: [] }),
+  setPipeline: (pipeline) => set({ pipeline }),
+  setQueue: (queue) => set({ queue }),
+  setHitlRequests: (hitlRequests) => set({ hitlRequests }),
+  setMetrics: (metrics) => set({ metrics }),
+  setTimeline: (timeline) => set({ timeline }),
+  setLoading: (loading) => set({ loading }),
+
+  resolveHitl: (id, action) =>
+    set((state) => ({
+      hitlRequests: state.hitlRequests.map((item) =>
+        item.id === id
+          ? { ...item, status: action === "approve" ? "approved" : "rejected" }
+          : item
+      ),
+    })),
 }));
