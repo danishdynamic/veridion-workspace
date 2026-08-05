@@ -4,9 +4,24 @@
 
 Veridion is an enterprise grade AI compliance assistant that understands versioned regulatory documents and guides users through form completion according to the exact version of an act or regulation. The platform combines advanced RAG, LangGraph multi agent orchestration, hybrid semantic search, evaluation pipelines, and real-time monitoring.
 
+> **Note**: This repository contains multiple services. The root README provides a high level overview of the complete platform, while each service includes its own dedicated README with implementation details, setup instructions, API information, and architecture documentation.
+
+---
+
+## Documentation
+
+This repository is organized into three independent applications. Each has its own documentation covering architecture, setup, implementation details, and future improvements.
+
+| Module | Description | Documentation |
+| :--- | :--- | :--- |
+| **Frontend (Next.js)** | User interface, dashboards, SEO, analytics, agent monitoring, state management, and UI components. | [`frontend/README.md`](./frontend/README.md) |
+| **Node.js Orchestrator** | LangGraph multi agent workflow, BullMQ, semantic cache, WebSocket streaming, and orchestration logic. | [`backend-node/README.md`](./backend-node/README.md) |
+| **FastAPI RAG Engine** | Document ingestion, chunking, embeddings, pgvector retrieval, reranking, evaluation, metrics, and caching. | [`backend-fastapi/README.md`](./backend-fastapi/README.md) |
+
 ---
 
 ## Architecture Overview
+
 
 ```mermaid
 %%{init: {
@@ -50,13 +65,13 @@ flowchart TD
 
 ## Features
 
-- **Version-Aware Document Retrieval**: Query specific versions of acts, regulations, and compliance updates with temporal metadata filtering.
-- **Parent-Child Chunking**: Retains top level document context (Parent) while matching fine grained search vectors (Child).
+- **Version Aware Document Retrieval**: Query specific versions of acts, regulations, and compliance updates with temporal metadata filtering.
+- **Parent Child Chunking**: Retains top level document context (Parent) while matching fine grained search vectors (Child).
 - **pgvector Hybrid Search**: HNSW index backed vector search paired with structural metadata filters.
 - **HyDE Query Expansion**: HypoDoc generator generates synthetic compliance responses to maximize vector similarity recall.
-- **Cross-Encoder Reranking**: Re scores top $K$ candidates to eliminate retrieval noise before LLM context injection.
-- **Multi-Tier Caching**: Dual layer caching strategy with a FastAPI Redis KV embedding cache and a Node.js semantic workflow cache.
-- **LangGraph Multi Agent Workflow**: Autonomous agents (Verifier, Summarizer, Visualizer) execute state-graph reasoning tasks.
+- **Cross Encoder Reranking**: Re scores top $K$ candidates to eliminate retrieval noise before LLM context injection.
+- **Multi Tier Caching**: Dual layer caching strategy with a FastAPI Redis KV embedding cache and a Node.js semantic workflow cache.
+- **LangGraph Multi Agent Workflow**: Autonomous agents (Verifier, Summarizer, Visualizer) execute state graph reasoning tasks.
 - **BullMQ Human in the Loop (HITL)**: Asynchronous task queues route low confidence agent responses for human review.
 - **WebSocket Agent Streaming**: Live execution feedback, agent states, and token streaming broadcast directly to the dashboard.
 - **Evaluation & Guardrails**: On the fly hallucination checks, context precision scoring, and ground truth verification.
@@ -168,8 +183,8 @@ flowchart LR
 
 ## Roadmap
 
-- [x] Version-Aware Hybrid Vector Retrieval
-- [x] Multi-Agent Orchestration with LangGraph
+- [x] Version Aware Hybrid Vector Retrieval
+- [x] Multi Agent Orchestration with LangGraph
 - [x] Asynchronous HITL Queues via BullMQ
 - [x] Performance Telemetry Dashboard
 
@@ -218,7 +233,7 @@ flowchart TD
 
 - Edge Reverse Proxy & Ingress: NGINX / Traefik ingress controller to handle SSL termination, rate limiting, CORS policy enforcement, and request routing.
 
-- Container Orchestration: Production deployment via Kubernetes (EKS/GKE) using Helm charts, automated Horizontal Pod Autoscaling (HPA), and zero-downtime rolling upgrades.
+- Container Orchestration: Production deployment via Kubernetes (EKS/GKE) using Helm charts, automated Horizontal Pod Autoscaling (HPA), and zero downtime rolling upgrades.
 
 - Observability & Tracing: Distributed tracing via OpenTelemetry instrumentation exported to Jaeger/Grafana Tempo, paired with Prometheus metrics and Sentry error tracking.
 
