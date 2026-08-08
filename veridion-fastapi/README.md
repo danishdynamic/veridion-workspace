@@ -3,6 +3,12 @@
 
 > High-performance vector retrieval, hierarchical document processing, HyDE expansion, and RAG evaluation service.
 
+[![FastAPI](https://img.shields.io/badge/backend--fastapi-0.1.0-green)](https://fastapi.tiangolo.com/)
+[![PostgreSQL](https://img.shields.io/badge/postgresql-0.1.0-blue)](https://www.postgresql.org/)
+[![pgvector](https://img.shields.io/badge/pgvector-0.1.0-red)](https://github.com/your-org/veridion/tree/main/pgvector)
+[![Redis](https://img.shields.io/badge/redis-0.1.0-orange)](https://redis.io/)
+[![OpenAI](https://img.shields.io/badge/openai-0.1.0-purple)](https://platform.openai.com/docs/)
+[![Gemini](https://img.shields.io/badge/gemini-0.1.0-lightblue)](https://developers.google.com/gemini)
 ---
 
 ## Overview & Responsibilities
@@ -11,12 +17,12 @@ The FastAPI engine serves as the core intelligence layer for regulatory document
 
 ### Core Responsibilities
 - **Document Ingestion**: Parsing, sanitizing, and processing regulatory legal texts.
-- **Hierarchical Chunking**: Parent-Child document segmentation preserving overarching section context.
-- **Vector Embeddings & Storage**: High-dimensional vector generation and storage in PostgreSQL via `pgvector` with HNSW indexing.
+- **Hierarchical Chunking**: Parent Child document segmentation preserving overarching section context.
+- **Vector Embeddings & Storage**: High dimensional vector generation and storage in PostgreSQL via `pgvector` with HNSW indexing.
 - **HyDE Query Expansion**: Generating Hypothetical Documents to improve dense retrieval recall.
 - **Reranking**: Cross-Encoder scoring to filter out irrelevant candidates.
-- **Caching**: Multi-key Redis KV embedding store to eliminate redundant embedding operations.
-- **RAG Evaluation**: On-the-fly measurement of Context Precision, Context Recall, and Faithfulness (Anti-Hallucination).
+- **Caching**: Multi key Redis KV embedding store to eliminate redundant embedding operations.
+- **RAG Evaluation**: On the fly measurement of Context Precision, Context Recall, and Faithfulness (Anti Hallucination).
 
 ---
 
@@ -145,7 +151,7 @@ The service embeds real-time evaluation steps into every synthesis request:
 
 - Anti-Hallucination Guardrail: Verifies that every assertion made in the generated response directly correlates with extracted context blocks.
 
-- Context Precision: Evaluates the signal-to-noise ratio within retrieved child chunks.
+- Context Precision: Evaluates the signal to noise ratio within retrieved child chunks.
 
 - Context Recall: Verifies whether all necessary regulatory facts were fetched relative to the target ground truth.
 
@@ -173,6 +179,6 @@ For enterprise deployment, the following backend architecture enhancements are p
 
 - Authentication & RBAC: Integrate OAuth2 JWT middleware validating signatures directly at the router level.
 
-- Metrics & Observability: Expose native /metrics endpoints for Prometheus scrapping and integrate OpenTelemetry auto-instrumentation for distributed request tracing.
+- Metrics & Observability: Expose native /metrics endpoints for Prometheus scrapping and integrate OpenTelemetry auto instrumentation for distributed request tracing.
 
-- API Rate Limiting & Circuit Breakers: Implement Redis-backed token-bucket rate limiting per tenant, paired with resilience circuit breakers around external LLM provider calls.
+- API Rate Limiting & Circuit Breakers: Implement Redis backed token bucket rate limiting per tenant, paired with resilience circuit breakers around external LLM provider calls.

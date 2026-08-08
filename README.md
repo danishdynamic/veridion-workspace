@@ -1,22 +1,21 @@
 # Veridion
 
-> AI-Powered Regulatory Version Intelligence Platform
+> AI Powered Regulatory Version Intelligence Platform
 
-Veridion is an enterprise grade AI compliance assistant that understands versioned regulatory documents and guides users through form completion according to the exact version of an act or regulation. The platform combines advanced RAG, LangGraph multi agent orchestration, hybrid semantic search, evaluation pipelines, and real-time monitoring.
+Veridion is a multi agent regulatory compliance platform that leverages LangGraph, FastAPI, and Next.js to provide version aware document retrieval, hybrid vector search, and real time performance monitoring. It orchestrates autonomous agents for legal verification, summarization, and visualization while managing human in the loop review queues and streaming execution states to the dashboard.
 
-> **Note**: This repository contains multiple services. The root README provides a high level overview of the complete platform, while each service includes its own dedicated README with implementation details, setup instructions, API information, and architecture documentation.
+[![backend-fastapi](https://img.shields.io/badge/backend--fastapi-0.1.0-blue)](https://github.com/your-org/veridion/tree/main/backend-fastapi) [![backend-node](https://img.shields.io/badge/backend--node-0.1.0-green)](https://github.com/your-org/veridion/tree/main/backend-node) [![frontend](https://img.shields.io/badge/frontend-0.1.0-yellow)](https://github.com/your-org/veridion/tree/main/frontend) [![Docker](https://img.shields.io/badge/docker-1.41.0-blue?logo=docker&logoColor=white)](https://www.docker.com/) [![postgresql](https://img.shields.io/badge/postgresql-16.0-blue)](https://www.postgresql.org/) [![redis](https://img.shields.io/badge/redis-7.2.6-red)](https://redis.io/)
 
 ---
 
-## Documentation
+## 📁 Project Documentation
 
-This repository is organized into three independent applications. Each has its own documentation covering architecture, setup, implementation details, and future improvements.
+>For detailed documentation, please refer to the following repositories:
 
-| Module | Description | Documentation |
-| :--- | :--- | :--- |
-| **Frontend (Next.js)** | User interface, dashboards, SEO, analytics, agent monitoring, state management, and UI components. | [`frontend/README.md`](./frontend/README.md) |
-| **Node.js Orchestrator** | LangGraph multi agent workflow, BullMQ, semantic cache, WebSocket streaming, and orchestration logic. | [`backend-node/README.md`](./backend-node/README.md) |
-| **FastAPI RAG Engine** | Document ingestion, chunking, embeddings, pgvector retrieval, reranking, evaluation, metrics, and caching. | [`backend-fastapi/README.md`](./backend-fastapi/README.md) |
+- Frontend Documentation: [![Frontend Documentation](https://img.shields.io/badge/frontend-0.1.0-yellow)](veridion-frontend/README.md)
+- Node.js Orchestrator Documentation: [![Node.js Orchestrator Documentation](https://img.shields.io/badge/backend--node-0.1.0-green)](veridion-node/README.md)
+- FastAPI RAG Engine Documentation: [![FastAPI RAG Engine Documentation](https://img.shields.io/badge/backend--fastapi-0.1.0-blue)](veridion-fastapi/README.md)
+
 
 ---
 

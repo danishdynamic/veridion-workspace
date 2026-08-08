@@ -3,6 +3,18 @@
 
 > Next.js 15 + React 19 frontend for the Veridion AI Regulatory Version Intelligence Platform.
 
+[![Next.js](https://img.shields.io/badge/Next.js-15.0.0-blue?logo=nextdotjs&logoColor=white)](https://nextjs.org/)
+[![React](https://img.shields.io/badge/React-19.0.0-blue?logo=react&logoColor=white)](https://reactjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.2.2-blue?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.3.3-blue?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![Zustand](https://img.shields.io/badge/Zustand-4.4.1-blue?logo=zustand&logoColor=white)](https://github.com/pmndrs/zustand)
+[![TanStack Query](https://img.shields.io/badge/TanStack%20Query-5.0.0-blue?logo=tanstack&logoColor=white)](https://tanstack.com/query/v5)
+[![Recharts](https://img.shields.io/badge/Recharts-2.6.2-blue?logo=recharts&logoColor=white)](https://recharts.org/)
+[![shadcn/ui](https://img.shields.io/badge/shadcn/ui-1.0.0-blue?logo=shadcn&logoColor=white)](https://ui.shadcn.com/)
+[![Framer Motion](https://img.shields.io/badge/Framer%20Motion-10.12.16-blue?logo=framer&logoColor=white)](https://www.framer.com/motion/)
+[![React Hook Form](https://img.shields.io/badge/React%20Hook%20Form-7.45.0-blue?logo=reacthookform&logoColor=white)](https://react-hook-form.com/)
+[![Zod](https://img.shields.io/badge/Zod-3.22.2-blue?logo=zod&logoColor=white)](https://zod.dev/)
+
 ---
 
 ## Overview
@@ -11,7 +23,7 @@ The Veridion Frontend provides a high performance, real time interactive user in
 
 ### Core Parameters
 
-- **Purpose**: Deliver an intuitive interface for inspecting versioned regulatory frameworks, tracking multi-agent reasoning graphs, managing file uploads, and visualizing platform performance metrics.
+- **Purpose**: Deliver an intuitive interface for inspecting versioned regulatory frameworks, tracking multi agent reasoning graphs, managing file uploads, and visualizing platform performance metrics.
 - **Responsibilities**:
   - Handle multi-part regulatory document uploads with associated temporal metadata.
   - Render real time streaming updates from the Node.js LangGraph agent workflow via WebSockets.
@@ -20,14 +32,14 @@ The Veridion Frontend provides a high performance, real time interactive user in
   - Maintain fluid dark/light design systems with accessible components and responsive layouts.
 - **Technologies**: Next.js 15 (App Router), React 19, TypeScript, TailwindCSS, shadcn/ui, Zustand, TanStack Query v5, Recharts, Framer Motion.
 - **Design Goals**:
-  - **User Interface**: Clean, enterprise-ready dashboard layout using accessible primitives.
+  - **User Interface**: Clean, enterprise ready dashboard layout using accessible primitives.
   - **SEO**: Fully optimized App Router dynamic metadata, OpenGraph tags, and structured JSON LD data.
-  - **Form Handling**: Strict client-side validation using React Hook Form backed by Zod schemas.
+  - **Form Handling**: Strict client side validation using React Hook Form backed by Zod schemas.
   - **Dashboard**: High-density data tables and real time visualization widgets.
   - **Analytics**: Comprehensive metric cards, trend charts, and cache execution graphs.
   - **Agent Monitoring**: Live node execution traces, progress bars, and streaming log outputs.
   - **Upload Experience**: Drag and drop file uploaders with file processing progress feedback.
-  - **Performance**: Zero CLS layouts, Server Component rendering, streaming Suspense boundaries, and code-split dynamic imports.
+  - **Performance**: Zero CLS layouts, Server Component rendering, streaming Suspense boundaries, and code split dynamic imports.
 
 ---
 
@@ -279,13 +291,13 @@ graph LR
   - `MetricCard`: KPI display widget showing metric values, deltas, and trend indicators.
   - `ChartCard`: Card shell wrapping Recharts instances with legend controls.
   - `AnalyticsFilters`: Time range picker (1h, 24h, 7d, 30d) and metric granularity controls.
-  - `DashboardGrid`: Responsive 12-column CSS grid layout for analytics cards.
+  - `DashboardGrid`: Responsive 12 column CSS grid layout for analytics cards.
 
 ---
 
 ## State Management
 
-State is managed via domain-specific **Zustand** stores for synchronous client UI states, paired with **TanStack Query (v5)** for async server state.
+State is managed via domain specific **Zustand** stores for synchronous client UI states, paired with **TanStack Query (v5)** for async server state.
 
 ```mermaid
 graph TD
@@ -363,7 +375,7 @@ graph LR
 
 ## Form Handling & Validation
 
-All user inputs are driven by **React Hook Form** paired with **Zod** schema resolvers to ensure client-side validation before network submission.
+All user inputs are driven by **React Hook Form** paired with **Zod** schema resolvers to ensure client side validation before network submission.
 
 ```typescript
 // Example Upload Validation Schema

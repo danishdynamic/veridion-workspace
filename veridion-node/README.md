@@ -3,6 +3,13 @@
 
 > Async multi agent workflow orchestration, LangGraph state machine execution, BullMQ queue management, and real time WebSocket streaming.
 
+[![Node.js](https://img.shields.io/badge/backend--node-0.1.0-green)](https://github.com/your-org/veridion/tree/main/backend-node)
+[![LangGraph](https://img.shields.io/badge/langgraph-0.1.0-purple)](https://github.com/your-org/veridion/tree/main/langgraph)
+[![BullMQ](https://img.shields.io/badge/bullmq-0.1.0-blue)](https://github.com/your-org/veridion/tree/main/bullmq)
+[![Redis](https://img.shields.io/badge/redis-0.1.0-orange)](https://github.com/your-org/veridion/tree/main/redis)
+[![WebSocket](https://img.shields.io/badge/websocket-0.1.0-yellow)](https://github.com/your-org/veridion/tree/main/websocket)
+[![PgVector](https://img.shields.io/badge/pgvector-0.1.0-red)](https://github.com/your-org/veridion/tree/main/pgvector)
+
 ---
 
 ## Overview & Responsibilities
