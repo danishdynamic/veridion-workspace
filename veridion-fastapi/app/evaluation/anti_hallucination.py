@@ -4,7 +4,7 @@ from typing import Any
 from google import genai
 from google.genai import types
 from pydantic import BaseModel
-
+from app.core.config import settings
 
 class HallucinationReport(BaseModel):
     is_hallucinated: bool
@@ -14,7 +14,7 @@ class HallucinationReport(BaseModel):
 class AntiHallucinationGuardrail:
     def __init__(self):
         # Uses standard GEMINI_API_KEY from environment variables
-        self.client = genai.Client()
+        self.client = genai.Client(api_key=settings.GEMINI_API_KEY)
 
     async def verify_alignment(
         self, generated_answer: str, source_contexts: list[str]

@@ -1,20 +1,25 @@
 # app/main.py
 import logging
+import os
 from contextlib import asynccontextmanager
+from dotenv import load_dotenv
+
+
+load_dotenv()
 
 from fastapi import FastAPI, status
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 
-# Explicit import ensures all models register on Base.metadata prior to create_all
+from app.core.config import settings
 import app.models
+
 from app.api.v1.ingest import router as ingest_router
 from app.api.v1.retrieve import router as retrieve_router
-from app.core.config import settings
 from app.core.database import Base, engine
 from app.metrics.metrics import metrics_monitor
 
-# Configure structured logging for system infrastructure tracking
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("veridion_bootloader")
 
@@ -28,7 +33,7 @@ async def lifespan(app: FastAPI):
     """
     logger.info("Initializing Veridion Flow Engine Substrate Layer...")
 
-    # 1. Execute Startup Health Probe & Dynamic Schema Creation
+    # Execute Startup Health Probe & Dynamic Schema Creation
     try:
         async with engine.begin() as conn:
             # A. Ensure the pgvector extension is enabled in PostgreSQL
@@ -52,7 +57,7 @@ async def lifespan(app: FastAPI):
 
     yield
 
-    # 2. Shutdown Phase
+    # Shutdown Phase
     logger.info("Tearing down service dependencies... Disposing database connection pools.")
     await engine.dispose()
     logger.info("Veridion Engine shutdown complete.")
@@ -66,8 +71,8 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# 3. Secure Cross-Origin Resource Sharing (CORS) Configuration
-cors_origins = [str(origin) for origin in settings.CORS_ORIGINS] if settings.CORS_ORIGINS else ["*"]
+# Secure Cross-Origin Resource Sharing (CORS) Configuration
+cors_origins = [str(origin) for origin in settings.CORS_ORIGINS] if getattr(settings, "CORS_ORIGINS", None) else ["*"]
 
 app.add_middleware(
     CORSMiddleware,
@@ -78,7 +83,7 @@ app.add_middleware(
 )
 
 
-# 4. Infrastructure Monitoring Endpoints
+# Infrastructure Monitoring Endpoints
 @app.get("/health", status_code=status.HTTP_200_OK, tags=["Infrastructure"])
 async def system_health_check():
     """Live heartbeat validation endpoint checking DB engine status for load balancers."""
@@ -102,6 +107,6 @@ async def get_llm_metrics():
     return await metrics_monitor.get_metrics()
 
 
-# 5. Mount Subsystem API Routers
+# Mount Subsystem API Routers
 app.include_router(ingest_router, prefix="/api/v1/ingest", tags=["Ingestion Subsystem"])
 app.include_router(retrieve_router, prefix="/api/v1/retrieve", tags=["Retrieval Subsystem"])

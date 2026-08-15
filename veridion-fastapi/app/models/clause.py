@@ -1,4 +1,3 @@
-# app/models/clause.py
 from typing import TYPE_CHECKING, Optional
 from uuid import uuid4
 
@@ -18,27 +17,26 @@ class Clause(Base):
     id: Mapped[str] = mapped_column(String, primary_key=True, default=lambda: str(uuid4()))
     section_id: Mapped[str] = mapped_column(
         String, 
-        ForeignKey("sections.id", ondelete="CASCADE"), 
+        ForeignKey("document_sections.id", ondelete="CASCADE"),  # FIXED: Matched table name 'document_sections'
         nullable=False,
         index=True
     )
 
-    clause_number: Mapped[Optional[str]] = mapped_column(String(50), nullable=True) # e.g., "4.1.2"
+    clause_number: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
     clause_text: Mapped[str] = mapped_column(Text, nullable=False)
     sequence_order: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
 
-    # Updated to 768 dimensions for Gemini text-embedding-004
+    # 768 dimensions for Gemini text-embedding-004
     embedding: Mapped[list[float]] = mapped_column(Vector(768), nullable=False)
 
     # Tier 3 Parent Link
     section: Mapped["DocumentSection"] = relationship(
-        "Section", 
+        "DocumentSection",  
         back_populates="clauses",
         lazy="raise"
     )
 
 
-# Accelerated HNSW metric index on 768-dimensional cosine distance
 Index(
     "idx_clauses_hnsw_cosine",
     Clause.embedding,

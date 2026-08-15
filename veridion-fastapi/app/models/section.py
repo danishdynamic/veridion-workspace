@@ -11,6 +11,7 @@ if TYPE_CHECKING:
     from app.models.clause import Clause
     from app.models.version import DocumentVersion
 
+
 class DocumentSection(Base):
     __tablename__ = "document_sections"
 
@@ -23,20 +24,20 @@ class DocumentSection(Base):
     )
     title: Mapped[str] = mapped_column(String, nullable=False)
     
-    part_number: Mapped[int] = mapped_column(Integer, nullable=False)  # Section sequence order
+    part_number: Mapped[int] = mapped_column(Integer, nullable=False)
     heading: Mapped[str | None] = mapped_column(String, nullable=True)
     section_text: Mapped[str] = mapped_column(Text, nullable=False)
-    embedding: Mapped[Vector | None] = mapped_column(Vector(786), nullable=True)
+    embedding: Mapped[Vector | None] = mapped_column(Vector(768), nullable=True)  # FIXED: Corrected 786 to 768
 
     version: Mapped["DocumentVersion"] = relationship("DocumentVersion", back_populates="sections", lazy="raise")
     clauses: Mapped[list["Clause"]] = relationship(
-        "DocumentClause",
+        "Clause", 
         back_populates="section",
         cascade="all, delete-orphan",
         lazy="raise"
     )
 
-# HNSW index on section vector space
+
 Index(
     "idx_sections_hnsw_cosine",
     DocumentSection.embedding,

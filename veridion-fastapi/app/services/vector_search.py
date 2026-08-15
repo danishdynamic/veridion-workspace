@@ -50,11 +50,12 @@ class VeridionVectorSearchService:
                 DocumentParent.version_tag.label("version_tag"),
                 DocumentParent.metadata_json.label("metadata"),
                 DocumentChildChunk.chunk_text.label("matched_child_text"),
+                # Extract parent text directly from JSON metadata or parent column
                 text("document_parents.metadata_json->>'parent_text'").label("parent_context"),
                 (1 - cosine_distance).label("similarity_score")
             )
+            .select_from(DocumentChildChunk)
             .join(DocumentParent, DocumentChildChunk.parent_id == DocumentParent.id)
-            # Fixed: Replaced comparison with native boolean truth check expression
             .where(DocumentParent.is_active)
         )
 

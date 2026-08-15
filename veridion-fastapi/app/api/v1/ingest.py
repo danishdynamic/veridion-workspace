@@ -8,8 +8,8 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
-from app.models.clause import DocumentClause
-from app.models.document import Document
+from app.models.clause import Clause
+from app.models.document import DocumentParent
 from app.models.section import DocumentSection
 from app.models.version import DocumentVersion
 
@@ -87,12 +87,12 @@ async def upload_and_version_document(
         # 2. Open atomic database transaction block
         async with db.begin():
             # Check if parent Document exists by title, or create a new one
-            stmt = select(Document).where(Document.title == title)
+            stmt = select(DocumentParent).where(DocumentParent.title == title)
             result = await db.execute(stmt)
             document = result.scalar_one_or_none()
 
             if not document:
-                document = Document(
+                document = DocumentParent(
                     id=str(uuid.uuid4()),
                     title=title,
                 )
@@ -143,7 +143,7 @@ async def upload_and_version_document(
                 await db.flush()
 
                 # Map individual paragraph/clause unit under the section
-                clause = DocumentClause(
+                clause = Clause(
                     id=str(uuid.uuid4()),
                     section_id=section.id,
                     clause_number=f"{idx}.1",
