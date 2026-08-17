@@ -16,6 +16,7 @@ import app.models
 
 from app.api.v1.ingest import router as ingest_router
 from app.api.v1.retrieve import router as retrieve_router
+from app.api.v1.version import router as version_router
 from app.core.database import Base, engine
 from app.metrics.metrics import metrics_monitor
 
@@ -110,3 +111,4 @@ async def get_llm_metrics():
 # Mount Subsystem API Routers
 app.include_router(ingest_router, prefix="/api/v1/ingest", tags=["Ingestion Subsystem"])
 app.include_router(retrieve_router, prefix="/api/v1/retrieve", tags=["Retrieval Subsystem"])
+app.include_router(version_router, prefix="/api/v1/version", tags=["Version Subsystem"]) 

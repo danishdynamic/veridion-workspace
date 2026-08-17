@@ -1,3 +1,4 @@
+// veridion-frontend/hooks/useAgent.ts
 import { useMutation } from "@tanstack/react-query";
 import { agentApi } from "@/api/agent";
 import { useAgentStore } from "@/store/agent.store";
@@ -10,11 +11,17 @@ export function useAgent() {
     mutationFn: (payload: RunPipelinePayload) => {
       reset();
       setLoading(true);
-      return agentApi.runPipeline(payload);
+      const enrichedPayload = {
+        ...payload,
+        clientId: payload.clientId || `client-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+      };
+      return agentApi.runPipeline(enrichedPayload);
     },
     onError: (err) => {
       setLoading(false);
       console.error("Agent Pipeline Mutation Error:", err);
+    },
+    onSuccess: () => {
     },
   });
 

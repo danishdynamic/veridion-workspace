@@ -1,3 +1,4 @@
+// veridion-frontend/hooks/useAgentSocket.ts
 import { useEffect } from "react";
 import { wsManager } from "@/lib/websocket";
 import { useAgentStore } from "@/store/agent.store";
@@ -12,7 +13,7 @@ export function useAgentSocket() {
     setChart,
     setErrors,
     setFinished,
-    setHitl,
+    setHitlState, 
   } = useAgentStore();
 
   useEffect(() => {
@@ -59,7 +60,7 @@ export function useAgentSocket() {
           break;
 
         case "hitl_required":
-          setHitl(true, {
+          setHitlState(true, { // FIXED: was setHitl
             prompt: msg.message,
             agentName: msg.agentName,
           });
@@ -98,7 +99,7 @@ export function useAgentSocket() {
     setChart,
     setErrors,
     setFinished,
-    setHitl,
+    setHitlState, 
   ]);
 
   return {

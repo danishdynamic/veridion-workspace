@@ -1,3 +1,4 @@
+// veridion-frontend/lib/websocket.ts
 import { SocketMessage } from "@/types/agent";
 
 type MessageHandler = (data: SocketMessage) => void;
@@ -9,7 +10,7 @@ class WebSocketManager {
   private maxReconnectAttempts = 5;
   private reconnectInterval = 3000;
 
-  public connect(url: string = process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:8000/ws") {
+  public connect(url: string = process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:3001") {
     if (this.socket && (this.socket.readyState === WebSocket.OPEN || this.socket.readyState === WebSocket.CONNECTING)) {
       return;
     }
