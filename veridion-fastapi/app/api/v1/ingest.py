@@ -40,7 +40,7 @@ def simple_text_splitter(text_content: str, chunk_size: int = 500) -> list[str]:
 @router.post("/upload", status_code=status.HTTP_201_CREATED)
 async def upload_and_version_document(
     title: str = Form(...),
-    version_tag: str = Form(...),
+    version_tag: str = Form(..., alias="versionTag"),
     sector: str = Form(...),
     region: str = Form(...),
     file: UploadFile = File(...),

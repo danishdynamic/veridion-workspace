@@ -8,6 +8,13 @@ Veridion is a multi agent regulatory compliance platform that leverages LangGrap
 
 ---
 
+## Product Demo
+
+![Screenshot](/veridion-frontend/public/image.png)
+
+
+---
+
 ## 📁 Project Documentation
 
 >For detailed documentation, please refer to the following repositories:
