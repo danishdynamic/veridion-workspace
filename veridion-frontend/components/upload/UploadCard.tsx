@@ -28,7 +28,7 @@ export function UploadCard({ loading = false, onSubmit }: UploadCardProps) {
     (e: React.DragEvent<HTMLDivElement>) => {
       e.preventDefault();
       const file = e.dataTransfer.files?.[0];
-      if (file) setValue("file", file, { validateStatus: true });
+      if (file) setValue("file", file, { shouldValidate: true });
     },
     [setValue]
   );
@@ -41,7 +41,7 @@ export function UploadCard({ loading = false, onSubmit }: UploadCardProps) {
       <div
         onDragOver={(e) => e.preventDefault()}
         onDrop={handleDrop}
-        className="flex min-h-[140px] cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-zinc-200 p-6 transition-colors hover:border-zinc-400 dark:border-zinc-800 dark:hover:border-zinc-600"
+        className="flex min-h-7.5 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-zinc-200 p-6 transition-colors hover:border-zinc-400 dark:border-zinc-800 dark:hover:border-zinc-600"
       >
         <input
           type="file"

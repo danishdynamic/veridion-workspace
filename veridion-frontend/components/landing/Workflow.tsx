@@ -35,7 +35,7 @@ export function Workflow() {
             className="relative flex items-start gap-4"
           >
             {/* Timeline Dot */}
-            <div className="absolute -left-[31px] sm:-left-[39px] top-1 flex h-6 w-6 items-center justify-center rounded-full bg-blue-600 text-white text-xs font-bold ring-4 ring-white dark:ring-zinc-950">
+            <div className="absolute -left-7.75 sm:-left-9.75 top-1 flex h-6 w-6 items-center justify-center rounded-full bg-blue-600 text-white text-xs font-bold ring-4 ring-white dark:ring-zinc-950">
               {idx + 1}
             </div>
 

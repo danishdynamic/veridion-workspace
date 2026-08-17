@@ -17,11 +17,11 @@ export const AgentTimeline: React.FC<Props> = ({ logs }) => {
   }
 
   return (
-    <ScrollArea className="h-[220px] rounded-md border border-zinc-200 p-4 bg-zinc-50/50">
+    <ScrollArea className="h-55 rounded-md border border-zinc-200 p-4 bg-zinc-50/50">
       <div className="relative pl-4 border-l-2 border-zinc-200 space-y-4">
         {logs.map((log, index) => (
           <div key={index} className="relative flex items-start space-x-3 text-xs">
-            <div className="absolute -left-[21px] top-0.5 bg-white rounded-full p-0.5">
+            <div className="absolute -left-5.25 top-0.5 bg-white rounded-full p-0.5">
               {log.status === "SUCCESS" ? (
                 <CircleCheck className="w-3.5 h-3.5 text-emerald-600" />
               ) : log.status === "FAILED" ? (

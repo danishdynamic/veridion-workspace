@@ -21,7 +21,7 @@ export const AgentTimeline: React.FC<AgentTimelineProps> = ({ events, loading })
       <div className="relative border-l-2 border-indigo-100 dark:border-indigo-950/50 ml-3 space-y-4">
         {events.map((evt) => (
           <div key={evt.id} className="relative pl-6">
-            <div className="absolute -left-[9px] top-0.5 bg-white dark:bg-zinc-950 p-0.5">
+            <div className="absolute -left-2.25 top-0.5 bg-white dark:bg-zinc-950 p-0.5">
               <CheckCircle2 className="w-4 h-4 text-indigo-600" />
             </div>
             <div className="flex items-center justify-between">

@@ -7,9 +7,9 @@ import { ArrowRight, FileText, Cpu, CheckCircle2 } from "lucide-react";
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden py-20 md:py-28 bg-gradient-to-b from-blue-50/50 via-white to-white dark:from-zinc-900/40 dark:via-zinc-950 dark:to-zinc-950">
+    <section className="relative overflow-hidden py-20 md:py-28 bg-linear-to-b from-blue-50/50 via-white to-white dark:from-zinc-900/40 dark:via-zinc-950 dark:to-zinc-950">
       {/* Background Gradient Mesh */}
-      <div className="absolute top-0 left-1/2 -z-10 h-[400px] w-[800px] -translate-x-1/2 rounded-full bg-blue-400/10 blur-3xl dark:bg-blue-600/10" />
+      <div className="absolute top-0 left-1/2 -z-10 h-100 w-200 -translate-x-1/2 rounded-full bg-blue-400/10 blur-3xl dark:bg-blue-600/10" />
 
       <div className="flex flex-col items-center text-center">
         {/* Badge */}
@@ -31,7 +31,7 @@ export function Hero() {
           className="max-w-4xl text-4xl font-extrabold tracking-tight text-zinc-900 dark:text-white sm:text-5xl md:text-6xl lg:text-6xl"
         >
           AI-Powered Regulatory <br className="hidden sm:inline" />
-          <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+          <span className="bg-linear-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
             Version Intelligence
           </span>
         </motion.h1>

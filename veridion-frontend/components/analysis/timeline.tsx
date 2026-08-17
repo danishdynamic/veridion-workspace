@@ -21,7 +21,7 @@ export function Timeline() {
         <div key={idx} className="flex gap-3 relative">
           {/* Connector line */}
           {idx < logs.length - 1 && (
-            <div className="absolute left-[11px] top-6 bottom-0 w-px bg-border" />
+            <div className="absolute left-2.75 top-6 bottom-0 w-px bg-border" />
           )}
           
           {/* Status icon */}
