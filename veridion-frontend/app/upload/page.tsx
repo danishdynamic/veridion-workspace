@@ -20,7 +20,7 @@ export default function UploadPage() {
 
       const res = await uploadMutation.mutateAsync({
         title: data.title,
-        versionTag: data.versionTag,
+        version: data.versionTag,
         sector: data.sector,
         region: data.region,
         file: data.file,

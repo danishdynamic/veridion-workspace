@@ -52,7 +52,12 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
         <QueryProvider>
-          <ThemeProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
             <div className="flex min-h-screen flex-col">
               <Navbar />
               <main className="flex-1">{children}</main>

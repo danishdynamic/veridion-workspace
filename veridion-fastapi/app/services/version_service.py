@@ -8,7 +8,7 @@ from sqlalchemy.orm import selectinload
 
 from app.core.config import settings
 from app.models.clause import Clause
-from app.models.section import Section
+from app.models.section import DocumentSection
 from app.schemas.version import ClauseChangeResponse, VersionCompareResponse, ChangeType
 from app.services.llm import generate_response
 
@@ -21,18 +21,18 @@ class VersionComparisonService:
         db: AsyncSession, 
         version_a_id: str, 
         version_b_id: str,
-        section_id: str = None
+        section_id: str 
     ) -> VersionCompareResponse:
         
         # 1. Retrieve Clauses for Version A (Baseline)
         stmt_a = (
             select(Clause)
-            .join(Section)
-            .where(Section.version_id == version_a_id)
+            .join(DocumentSection)
+            .where(DocumentSection.version_id == version_a_id)
             .order_by(Clause.sequence_order)
         )
         if section_id:
-            stmt_a = stmt_a.where(Section.id == section_id)
+            stmt_a = stmt_a.where(DocumentSection.id == section_id)
         
         result_a = await db.execute(stmt_a)
         clauses_a = result_a.scalars().all()
@@ -40,12 +40,12 @@ class VersionComparisonService:
         # 2. Retrieve Clauses for Version B (Target)
         stmt_b = (
             select(Clause)
-            .join(Section)
-            .where(Section.version_id == version_b_id)
+            .join(DocumentSection)
+            .where(DocumentSection.version_id == version_b_id)
             .order_by(Clause.sequence_order)
         )
         if section_id:
-            stmt_b = stmt_b.where(Section.id == section_id)
+            stmt_b = stmt_b.where(DocumentSection.id == section_id)
 
         result_b = await db.execute(stmt_b)
         clauses_b = result_b.scalars().all()

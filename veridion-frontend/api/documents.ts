@@ -43,8 +43,13 @@ export const documentsApi = {
 
   // GET /documents
   getAll: async (): Promise<Document[]> => {
-    const response = await api.get<Document[]>("/documents");
-    return response.data;
+    // const response = await api.get<Document[]>("/documents");
+    // return response.data;
+    const response = await api.get("/documents");
+    const data = response.data;
+    
+    // Safely extract the array regardless of how FastAPI wrapped it
+    return Array.isArray(data) ? data : data.documents || data.data || [];
   },
 
   // DELETE /documents/:id

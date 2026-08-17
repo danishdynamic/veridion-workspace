@@ -8,7 +8,7 @@ export const metadata = {
 
 export default function DocumentsPage() {
   return (
-    <div className="py-8 space-y-10">
+    <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-10">
       {/* Page Header */}
       <div>
         <h1 className="text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-white">

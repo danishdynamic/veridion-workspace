@@ -16,8 +16,17 @@ export function useDocuments() {
     },
   });
 
+  // Extract the raw data
+  const rawData = query.data;
+  
+  // Force it into an array format
+  const safeDocuments = Array.isArray(rawData) 
+    ? rawData 
+    : (rawData as any)?.documents || (rawData as any)?.data || [];
+
   return {
-    documents: query.data ?? [],
+    //documents: query.data ?? [],
+    documents : safeDocuments,
     isLoading: query.isLoading,
     isError: query.isError,
     error: query.error,
